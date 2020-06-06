@@ -75,8 +75,9 @@ def main():
             continue
 
         height, width, channels = frame.shape
-        crop = (width//2 - height)//2
-        left, right = frame[:, crop:(width//2-crop)], frame[:, (width//2+crop):-crop]
+        # crop = (width//2 - height)//2
+        # left, right = frame[:, crop:(width//2-crop)], frame[:, (width//2+crop):-crop]
+        left, right = frame[:, :width//2], frame[:, width//2:]
         height, width, channels = left.shape
         full_frame = (0, 0, width, height)
 
@@ -89,10 +90,11 @@ def main():
             for roi in rois[side]:
                 roiL, roiT, roiR, roiB = XYWH_to_LTRB(roi)
                 cv2.rectangle(image, (roiL, roiT), (roiR, roiB),
-                              (30, 50, 70), 1)
+                              (255*.9, 255*.1, 255*.1), 1)
 
             roi_images = [((x, y), image[y:y+h, x:x+w]) for (x, y, w, h) in rois[side]]
-            cv2.imshow(f'roi_{side}', roi_images[0][1])
+            for i, roi_image in enumerate(roi_images):
+                cv2.imshow(f'roi_{side}_{i}', roi_image[1])
 
             def detect_upscale_fallback(frame, max_upscale):
                 for scale in range(max_upscale):
@@ -138,7 +140,7 @@ def main():
                 # frame
                 rectL, rectT, rectR, rectB = XYWH_to_LTRB(rect)
                 cv2.rectangle(image, (rectL, rectT), (rectR, rectB),
-                            (0, 255, 0) if fresh else (0, 50, 0), 1)
+                            (0, 255, 0) if fresh else (0, 128, 0), 1)
 
                 # determine the facial landmarks for the face region, then
                 # convert the facial landmark (x, y)-coordinates to a NumPy
